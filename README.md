@@ -3,7 +3,7 @@
 ##应用场景
 autopublish.py 初步实现了一个通用性较强的代码发布管理功能，支持快速部署与回滚，无论发布还是回滚，
 都可以通过切换current的软链来实现，比较灵活。
-[](https://github.com/ollylu/fabric-autopublish/blob/master/autopublish.png)
+
 
 ## 安装与配置
 
@@ -67,6 +67,7 @@ drwxr-xr-x 8 root root   4096 Aug  2 05:50 .git/
 
     版本号
     deploy_version=v9.0.1
+```
 
 执行发布
 ```
