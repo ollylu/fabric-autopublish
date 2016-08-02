@@ -81,7 +81,7 @@ def input_versionid():
     return prompt("please input project rollback version ID:",default="")
     
 
-@task
+
 @runs_once
 def tar_source():
     """
@@ -95,7 +95,7 @@ def tar_source():
     print green("Creating source package success！")
     
 
-@task
+
 def put_package():
     """
     #上传任务函数
@@ -127,7 +127,7 @@ def put_package():
     
     print green("Put & untar package success！")
 
-@task
+
 def make_symlink():
     """
     #为当前版本目录做软链接
