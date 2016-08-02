@@ -104,6 +104,7 @@ def put_package():
     
     #上传项目压缩包至此目录
     with settings(warn_only=True):
+        print green(env.deploy_full_path)
         result = put(os.path.join(env.project_tar_source, env.project_pack_name) +".tar.gz", env.deploy_full_path)
     
     if result.failed and no("put file failed, Continue[Y/N]？"):
