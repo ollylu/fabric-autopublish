@@ -14,6 +14,17 @@ from fabric.colors import *
 from fabric.context_managers import *
 from fabric.contrib.console import confirm
 
+env.user='root'                #生产集群机器用户
+env.hosts=[]                   #生产集群机器IP列表
+env.password=''                #生产集群机器密码
+env.project_dev_source = ''    #开发机项目主目录 如：/data/dev/Lwebadmin
+env.project_tar_source = ''    #开发机项目压缩包存储目录 如：/data/dev/releases
+env.project_pack_name = ''     #项目压缩包名前缀, 如：release 文件名为release.tar.gz
+env.deploy_project_root = ''   #项目生产环境主目录 如：/data/www/Lwebadmin
+env.deploy_release_dir = ''    #项目发布目录,位于主目录下面 如：releases
+env.deploy_current_dir = ''    #对外服务的当前版本,软链接 如：current
+env.deploy_version=''          #版本号 如 20160517v9.0.1
+
 
 def valid_ip(address):
     """
@@ -53,22 +64,10 @@ def get_config_form_config_ini():
        
     if not os.path.isdir(env.project_dev_source):
        abort("Aborting project_dev_source not such dir!")
-
-env.user='root'                #生产集群机器用户
-env.hosts=[]                   #生产集群机器IP列表
-env.password=''                #生产集群机器密码
-env.project_dev_source = ''    #开发机项目主目录 如：/data/dev/Lwebadmin
-env.project_tar_source = ''    #开发机项目压缩包存储目录 如：/data/dev/releases
-env.project_pack_name = ''     #项目压缩包名前缀, 如：release 文件名为release.tar.gz
-env.deploy_project_root = ''   #项目生产环境主目录 如：/data/www/Lwebadmin
-env.deploy_release_dir = ''    #项目发布目录,位于主目录下面 如：releases
-env.deploy_current_dir = ''    #对外服务的当前版本,软链接 如：current
-env.deploy_version=''          #版本号 如 20160517v9.0.1
-get_config_form_config_ini()
-
-
        
-    
+#在入口函数之前，获取配置，填充env
+get_config_form_config_ini()
+   
 @runs_once
 def input_versionid():
     """
@@ -85,8 +84,8 @@ def tar_source():
     """
     print yellow("Creating source package...")
     
-    with cd(env.project_dev_source):
-        local("tar -czf %s.tar.gz ." % (env.project_tar_source + env.project_pack_name))
+    with lcd(env.project_dev_source):
+        local("tar -czf %s.tar.gz ." % os.path.join(env.project_tar_source, env.project_pack_name))
     
     print green("Creating source package success！")
     
@@ -100,20 +99,20 @@ def put_package():
     
     #创建版本目录
     with settings(warn_only=True):
-        with cd(env.deploy_project_root+env.deploy_release_dir):       
+        with cd(os.path.join(env.deploy_project_root, env.deploy_release_dir)):       
             run("mkdir %s" % (env.deploy_version))     
     
     #上传项目压缩包至此目录
     with settings(warn_only=True):
-        result = put(env.project_tar_source + env.project_pack_name +".tar.gz", env.deploy_full_path)
+        result = put(os.path.join(env.project_tar_source, env.project_pack_name) +".tar.gz", env.deploy_full_path)
     
     if result.failed and no("put file failed, Continue[Y/N]？"):
         abort("Aborting file put task！")
     
     #成功解压后删除压缩包
     with cd(env.deploy_full_path):
-        run("tar -zxvf %s.tar.gz" % (env.project_pack_name))
-        run("rm -rf %s.tar.gz" % (env.project_pack_name))
+        run("tar -zxvf %s.tar.gz" % env.project_pack_name)
+        run("rm -rf %s.tar.gz" % env.project_pack_name)
     
     print green("Put & untar package success！")
 
@@ -126,9 +125,9 @@ def make_symlink():
     
     #删除软链接,重新创建并指定软链源目录,新版本生效
     with settings(warn_only=True):    
-        run("rm -rf %s" % (env.deploy_project_root + env.deploy_current_dir))
+        run("rm -rf %s" % os.path.join(env.deploy_project_root, env.deploy_current_dir) )
         run("ln -s %s %s" % (env.deploy_full_path, \
-                             env.deploy_project_root + env.deploy_current_dir))
+                             os.path.join(env.deploy_project_root, env.deploy_current_dir)) )
         
     print green("make symlink success！")
 
@@ -152,8 +151,8 @@ def rollback():
                                       versionid)
     
     #删除软链接,重新创建并指定软链源目录,新版本生效
-    run("rm -rf %s" % env.deploy_project_root + env.deploy_current_dir)
-    run("ln -s %s %s" % (env.deploy_full_path, env.deploy_project_root + env.deploy_current_dir))
+    run("rm -rf %s" % os.path.join(env.deploy_project_root, env.deploy_current_dir) )
+    run("ln -s %s %s" % (env.deploy_full_path, os.path.join(env.deploy_project_root, env.deploy_current_dir)) )
     
     print green("rollback success！")
 
@@ -162,7 +161,6 @@ def go():
     """
     #自动化版本发布入口函数
     """
-    get_config_form_config_ini()
     tar_source()
     put_package()
     make_symlink() 
