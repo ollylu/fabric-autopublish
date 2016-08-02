@@ -7,7 +7,7 @@ auto publish script
 @author: ollylu
 '''
 
-import os, time, socket
+import os, time, re
 import ConfigParser
 from fabric.api import *
 from fabric.colors import *
@@ -28,13 +28,17 @@ env.deploy_version=''          #版本号 如 20160517v9.0.1
 
 def valid_ip(address):
     """
-    #从配置文件中获取配置
+    #只对IP有效性 做最基本检查
     """
+    pieces = address.split('.')
+    
+    if len(pieces) != 4: 
+       return False
     try: 
-        socket.inet_aton(address)
-        return True
-    except:
-        return False
+       return all(0<=int(p)<256 for p in pieces)
+       
+    except ValueError: 
+       return False
     
 @runs_once
 def get_config_form_config_ini():
@@ -56,7 +60,7 @@ def get_config_form_config_ini():
     env.deploy_current_dir=config.get("env","deploy_current_dir").strip(" \n\r\t")
     env.deploy_version=time.strftime("%Y%m%d") + config.get("env","deploy_version").strip(" \n\r\t")  
     env.hosts=[IP for IP in config.get("env","hosts").strip(" \n\r\t").split(',') if valid_ip(IP)]
-    print env.hosts
+
     env.deploy_full_path=os.path.join(env.deploy_project_root, env.deploy_release_dir, env.deploy_version)
     
     if len(env.hosts)<1:
@@ -83,7 +87,7 @@ def tar_source():
     #打包本地项目主目录,并将压缩包存储到本地压缩包目录
     """
     print yellow("Creating source package...")
-    
+    local("mkdir -p %s" % env.project_tar_source)
     with lcd(env.project_dev_source):
         local("tar -czf %s.tar.gz ." % os.path.join(env.project_tar_source, env.project_pack_name))
     
@@ -105,7 +109,7 @@ def put_package():
             run("mkdir -p %s" % os.path.join(env.deploy_project_root, env.deploy_release_dir)) 
             
         with cd(os.path.join(env.deploy_project_root, env.deploy_release_dir)):       
-            run("mkdir %s" % env.deploy_version)     
+            run("mkdir -p %s" % env.deploy_version)     
     
     #上传项目压缩包至此目录
     with settings(warn_only=True):
