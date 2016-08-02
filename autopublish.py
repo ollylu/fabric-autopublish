@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 '''
 Created on 2016/8/1
   
@@ -42,7 +42,7 @@ def get_config_form_config_ini():
     """
     
     config = ConfigParser.ConfigParser()    
-    with open(os.path.join(os.path.dirname(__file__),'config.ini')) as fd:
+    with open(os.path.join(os.path.dirname(__file__),'config.ini'),'r') as fd:
         config.readfp(fd)
   
     env.user=config.get("env","user").strip(" \n\r\t")
