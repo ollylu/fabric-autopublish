@@ -14,17 +14,6 @@ from fabric.colors import *
 from fabric.context_managers import *
 from fabric.contrib.console import confirm
 
-env.user='root'                #生产集群机器用户
-env.hosts=[]                   #生产集群机器IP列表
-env.password=''                #生产集群机器密码
-env.project_dev_source = ''    #开发机项目主目录 如：/data/dev/Lwebadmin
-env.project_tar_source = ''    #开发机项目压缩包存储目录 如：/data/dev/releases
-env.project_pack_name = ''     #项目压缩包名前缀, 如：release 文件名为release.tar.gz
-env.deploy_project_root = ''   #项目生产环境主目录 如：/data/www/Lwebadmin
-env.deploy_release_dir = ''    #项目发布目录,位于主目录下面 如：releases
-env.deploy_current_dir = ''    #对外服务的当前版本,软链接 如：current
-env.deploy_version=''          #版本号 如 20160517v9.0.1
-get_config_form_config_ini()
 
 def valid_ip(address):
     """
@@ -64,6 +53,20 @@ def get_config_form_config_ini():
        
     if not os.path.isdir(env.project_dev_source):
        abort("Aborting project_dev_source not such dir!")
+
+env.user='root'                #生产集群机器用户
+env.hosts=[]                   #生产集群机器IP列表
+env.password=''                #生产集群机器密码
+env.project_dev_source = ''    #开发机项目主目录 如：/data/dev/Lwebadmin
+env.project_tar_source = ''    #开发机项目压缩包存储目录 如：/data/dev/releases
+env.project_pack_name = ''     #项目压缩包名前缀, 如：release 文件名为release.tar.gz
+env.deploy_project_root = ''   #项目生产环境主目录 如：/data/www/Lwebadmin
+env.deploy_release_dir = ''    #项目发布目录,位于主目录下面 如：releases
+env.deploy_current_dir = ''    #对外服务的当前版本,软链接 如：current
+env.deploy_version=''          #版本号 如 20160517v9.0.1
+get_config_form_config_ini()
+
+
        
     
 @runs_once
