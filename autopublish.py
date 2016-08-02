@@ -56,7 +56,7 @@ def get_config_form_config_ini():
     env.deploy_current_dir=config.get("env","deploy_current_dir").strip(" \n\r\t")
     env.deploy_version=time.strftime("%Y%m%d") + config.get("env","deploy_version").strip(" \n\r\t")  
     env.hosts=[IP for IP in config.get("env","hosts").strip(" \n\r\t").split(',') if valid_ip(IP)]
-    
+    print env.hosts
     env.deploy_full_path=os.path.join(env.deploy_project_root, env.deploy_release_dir, env.deploy_version)
     
     if len(env.hosts)<1:
@@ -99,12 +99,13 @@ def put_package():
     
     #创建版本目录
     with settings(warn_only=True):
-        run("ls -l /data")
-    with settings(warn_only=True):
-        run("mkdir /lpctest")
-    with settings(warn_only=True):
+        run("mkdir -p %s" % env.deploy_project_root)
+        
+        with cd(env.deploy_project_root): 
+            run("mkdir -p %s" % os.path.join(env.deploy_project_root, env.deploy_release_dir)) 
+            
         with cd(os.path.join(env.deploy_project_root, env.deploy_release_dir)):       
-            run("mkdir %s" % (env.deploy_version))     
+            run("mkdir %s" % env.deploy_version)     
     
     #上传项目压缩包至此目录
     with settings(warn_only=True):
