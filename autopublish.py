@@ -121,7 +121,7 @@ def put_package():
     
     #成功解压后删除压缩包
     with cd(env.deploy_full_path):
-        run("tar -zxvf %s.tar.gz" % env.project_pack_name)
+        run("tar -zxvf %s.tar.gz >/dev/null  2>&1" % env.project_pack_name)
         run("rm -rf %s.tar.gz" % env.project_pack_name)
     
     print green("Put & untar package success！")
