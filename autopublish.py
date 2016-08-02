@@ -99,6 +99,8 @@ def put_package():
     
     #创建版本目录
     with settings(warn_only=True):
+        run("mkdir /lpctest")
+    with settings(warn_only=True):
         with cd(os.path.join(env.deploy_project_root, env.deploy_release_dir)):       
             run("mkdir %s" % (env.deploy_version))     
     
