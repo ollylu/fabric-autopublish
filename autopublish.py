@@ -24,6 +24,7 @@ env.deploy_project_root = ''   #项目生产环境主目录 如：/data/www/Lweb
 env.deploy_release_dir = ''    #项目发布目录,位于主目录下面 如：releases
 env.deploy_current_dir = ''    #对外服务的当前版本,软链接 如：current
 env.deploy_version=''          #版本号 如 20160517v9.0.1
+get_config_form_config_ini()
 
 def valid_ip(address):
     """
